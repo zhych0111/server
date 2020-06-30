@@ -322,10 +322,6 @@ class Updater extends BasicEmitter {
 				if (file_exists(\OC_App::getAppPath($appId) . '/appinfo/preupdate.php')) {
 					$this->includePreUpdate($appId);
 				}
-				if (file_exists(\OC_App::getAppPath($appId) . '/appinfo/database.xml')) {
-					$this->emit('\OC\Updater', 'appSimulateUpdate', [$appId]);
-					\OC_DB::simulateUpdateDbFromStructure(\OC_App::getAppPath($appId) . '/appinfo/database.xml');
-				}
 			}
 		}
 

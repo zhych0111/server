@@ -43,8 +43,8 @@ use Doctrine\DBAL\Exception\TableExistsException;
 use OC\App\AppStore\Bundles\Bundle;
 use OC\App\AppStore\Fetcher\AppFetcher;
 use OC\Archive\TAR;
+use OC\DB\MigrationService;
 use OC_App;
-use OC_DB;
 use OC_Helper;
 use OCP\Http\Client\IClientService;
 use OCP\IConfig;
@@ -111,6 +111,11 @@ class Installer {
 		}
 
 		$basedir = $app['path'].'/'.$appId;
+
+		if (is_file($basedir . '/appinfo/database.xml')) {
+			throw new \Exception('The appinfo/database.xml file is not longer supported. Used in ' . $appId);
+		}
+
 		$info = OC_App::getAppInfo($basedir.'/appinfo/info.xml', true);
 
 		$l = \OC::$server->getL10N('core');
@@ -146,16 +151,9 @@ class Installer {
 		}
 
 		//install the database
-		if (is_file($basedir.'/appinfo/database.xml')) {
-			if (\OC::$server->getConfig()->getAppValue($info['id'], 'installed_version') === null) {
-				OC_DB::createDbFromStructure($basedir.'/appinfo/database.xml');
-			} else {
-				OC_DB::updateDbFromStructure($basedir.'/appinfo/database.xml');
-			}
-		} else {
-			$ms = new \OC\DB\MigrationService($info['id'], \OC::$server->getDatabaseConnection());
-			$ms->migrate();
-		}
+		$ms = new MigrationService($info['id'], \OC::$server->getDatabaseConnection());
+		$ms->migrate();
+
 		if ($previousVersion) {
 			OC_App::executeRepairSteps($appId, $info['repair-steps']['post-migration']);
 		}
@@ -572,20 +570,8 @@ class Installer {
 		$appPath = OC_App::getAppPath($app);
 		\OC_App::registerAutoloading($app, $appPath);
 
-		if (is_file("$appPath/appinfo/database.xml")) {
-			try {
-				OC_DB::createDbFromStructure("$appPath/appinfo/database.xml");
-			} catch (TableExistsException $e) {
-				throw new HintException(
-					'Failed to enable app ' . $app,
-					'Please ask for help via one of our <a href="https://nextcloud.com/support/" target="_blank" rel="noreferrer noopener">support channels</a>.',
-					0, $e
-				);
-			}
-		} else {
-			$ms = new \OC\DB\MigrationService($app, \OC::$server->getDatabaseConnection());
-			$ms->migrate();
-		}
+		$ms = new MigrationService($app, \OC::$server->getDatabaseConnection());
+		$ms->migrate();
 
 		//run appinfo/install.php
 		self::includeAppScript("$appPath/appinfo/install.php");
