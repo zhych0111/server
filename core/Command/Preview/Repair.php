@@ -96,7 +96,7 @@ class Repair extends Command {
 
 		$verbose = $output->isVerbose();
 
-		$instanceId = $this->config->getSystemValueString('instanceid');
+		$instanceId = $this->config->getSystemValue('instanceid');
 
 		$output->writeln("This will migrate all previews from the old preview location to the new one.");
 		$output->writeln('');
@@ -163,13 +163,13 @@ class Repair extends Command {
 
 		$output->writeln("");
 		$output->writeln("");
-		$section1 = $output->section();
-		$section2 = $output->section();
+		$section1 = $output;
+		$section2 = $output;
 		$progressBar = new ProgressBar($section2, $total);
-		$progressBar->setFormat("%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% Used Memory: %memory:6s%");
+		$progressBar->setFormat("%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% Used Memory: %memory:6s%\n");
 		$time = (new \DateTime())->format('H:i:s');
 		$progressBar->setMessage("$time Starting …");
-		$progressBar->maxSecondsBetweenRedraws(0.2);
+		$progressBar->setOverwrite(false);
 		$progressBar->start();
 
 		foreach ($directoryListing as $oldPreviewFolder) {
@@ -177,7 +177,6 @@ class Repair extends Command {
 			$name = $oldPreviewFolder->getName();
 			$time = (new \DateTime())->format('H:i:s');
 			$section1->writeln("$time Migrating previews of file with fileId $name …");
-			$progressBar->display();
 
 			if ($this->stopSignalReceived) {
 				$section1->writeln("$time Stopping migration …");
