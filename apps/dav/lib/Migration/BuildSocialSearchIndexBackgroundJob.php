@@ -101,7 +101,7 @@ class BuildSocialSearchIndexBackgroundJob extends QueuedJob {
 		$query->select('c.id', 'c.addressbookid', 'c.uri', 'c.carddata')
 			->from('cards_properties', 'p')
 			->leftJoin('p', 'cards', 'c', 'c.id = p.cardid')
-			->where('p.name=\'X-SOCIALPROFILE\'')
+			->where($query->expr()->eq('p.name', $query->createNamedParameter('X-SOCIALPROFILE')))
 			->andWhere($query->expr()->lte('c.id', $query->createNamedParameter($stopAt)))
 			->andWhere($query->expr()->gt('c.id', $query->createNamedParameter($offset)))
 			->orderBy('c.id', 'ASC');
