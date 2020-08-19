@@ -75,7 +75,7 @@ class BuildSocialSearchIndex implements IRepairStep {
 		$query = $this->db->getQueryBuilder();
 		$query->select($query->createFunction('MAX(' . $query->getColumnName('cardid') . ')'))
 			->from('cards_properties')
-			->where('name=\'X-SOCIALPROFILE\'');
+			->where($query->expr()->eq('name', $query->createNamedParameter('X-SOCIALPROFILE')));
 		$maxId = (int)$query->execute()->fetchColumn();
 		
 		if ($maxId === 0) {
