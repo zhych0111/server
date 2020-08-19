@@ -77,6 +77,10 @@ class BuildSocialSearchIndex implements IRepairStep {
 			->from('cards_properties')
 			->where('name=\'X-SOCIALPROFILE\'');
 		$maxId = (int)$query->execute()->fetchColumn();
+		
+		if ($maxId === 0) {
+			return;
+		}
 
 		$output->info('Add background job');
 		$this->jobList->add(BuildSocialSearchIndexBackgroundJob::class, [
