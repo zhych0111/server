@@ -104,20 +104,25 @@ class BuildSocialSearchIndexBackgroundJob extends QueuedJob {
 			->where($query->expr()->eq('p.name', $query->createNamedParameter('X-SOCIALPROFILE')))
 			->andWhere($query->expr()->lte('c.id', $query->createNamedParameter($stopAt)))
 			->andWhere($query->expr()->gt('c.id', $query->createNamedParameter($offset)))
-			->orderBy('c.id', 'ASC');
-		$social_cards = $query->execute();
+			->orderBy('c.id', 'ASC')
+			->setMaxResults(100);
+		$social_cards = $query->execute()->fetchAll();
+
+		if (empty($social_cards)) {
+			return $stopAt;
+		}
 
 		// refresh identified contacts in order to re-index
-		while ($row = $social_cards->fetch(\PDO::FETCH_ASSOC)) {
-			$this->davBackend->updateCard($row['addressbookid'], $row['uri'], $row['carddata']);
+		foreach ($social_cards as $contact) {
+			$offset = $contact['id'];
+			$this->davBackend->updateCard($contact['addressbookid'], $contact['uri'], $contact['carddata']);
 
-			// stop after 15min (to be continued with next chunk)
+			// stop after 15sec (to be continued with next chunk)
 			if (($this->timeFactory->getTime() - $startTime) > 15) {
-				$offset = $row['id'];
-				return $offset;
+				break;
 			}
 		}
 
-		return $stopAt;
+		return $offset;
 	}
 }
