@@ -511,12 +511,35 @@ export default {
 	.statuses ::v-deep .action-item > button,
 	.statuses ::v-deep .action-item.action-item--open .action-item__menutoggle {
 		background-color: var(--color-background-translucent);
-		backdrop-filter: var(--background-blur);
 
 		&:hover,
 		&:focus,
 		&:active {
 			background-color: var(--color-background-hover);
+		}
+	}
+
+	// Blur if backdrop-filter is supported
+	@supports((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+		.panel,
+		.panels > div,
+		.edit-panels,
+		.statuses ::v-deep .action-item > button,
+		.statuses ::v-deep .action-item.action-item--open .action-item__menutoggle {
+			-webkit-backdrop-filter: blur(10px);
+			backdrop-filter: blur(10px);
+		}
+	}
+
+	// Blur if backdrop-filter is NOT supported
+	@supports(not((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px)))) {
+		.panel,
+		.panels > div,
+		.edit-panels,
+		.statuses ::v-deep .action-item > button,
+		.statuses ::v-deep .action-item.action-item--open .action-item__menutoggle {
+			-webkit-filter: url(#backdrop-filter-blur);
+			filter: url(#backdrop-filter-blur);
 		}
 	}
 
