@@ -95,16 +95,10 @@ class BuildSocialSearchIndexBackgroundJob extends QueuedJob {
 
 		// get contacts with social profiles
 		$query = $this->db->getQueryBuilder();
-		// TODO: return contacts with multiple social profiles only once
-		// FIXME: distinct seems only to return the first parameter?
-		// $query->selectDistinct('c.addressbookid', 'c.uri', 'c.carddata')
-		$query->select('c.id', 'c.addressbookid', 'c.uri', 'c.carddata')
-			->from('cards_properties', 'p')
-			->leftJoin('p', 'cards', 'c', 'c.id = p.cardid')
-			->where($query->expr()->eq('p.name', $query->createNamedParameter('X-SOCIALPROFILE')))
-			->andWhere($query->expr()->lte('c.id', $query->createNamedParameter($stopAt)))
-			->andWhere($query->expr()->gt('c.id', $query->createNamedParameter($offset)))
-			->orderBy('c.id', 'ASC')
+		$query->select('id', 'addressbookid', 'uri', 'carddata')
+			->from('cards', 'c')
+			->orderBy('id', 'ASC')
+			->where($query->expr()->like('carddata', $query->createNamedParameter('%SOCIALPROFILE%')))
 			->setMaxResults(100);
 		$social_cards = $query->execute()->fetchAll();
 
