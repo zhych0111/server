@@ -46,10 +46,14 @@ class Capabilities implements IPublicCapability {
 	}
 
 	public function getCapabilities() {
-		return [
-			'bruteforce' => [
-				'delay' => $this->throttler->getDelay($this->request->getRemoteAddress())
-			]
-		];
+		try {
+			return [
+				'bruteforce' => [
+					'delay' => $this->throttler->getDelay($this->request->getRemoteAddress())
+				]
+			];
+		} catch (\Throwable $e) {
+			return [];
+		}
 	}
 }
