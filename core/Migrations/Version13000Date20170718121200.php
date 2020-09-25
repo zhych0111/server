@@ -124,7 +124,7 @@ class Version13000Date20170718121200 extends SimpleMigrationStep {
 			$table->addUniqueIndex(['user_id', 'root_id'], 'mounts_user_root_index');
 		} else {
 			$table = $schema->getTable('mounts');
-			$table->addColumn('mount_id', Type::BIGINT, [
+			$table->addColumn('mount_id', Types::BIGINT, [
 				'notnull' => false,
 				'length' => 20,
 			]);
