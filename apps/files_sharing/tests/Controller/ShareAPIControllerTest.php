@@ -564,6 +564,7 @@ class ShareAPIControllerTest extends TestCase {
 			'share_type' => \OCP\Share::SHARE_TYPE_USER,
 			'share_with' => 'userId',
 			'share_with_displayname' => 'userDisplay',
+			'share_with_displayname_unique' => 'userId@example.com',
 			'uid_owner' => 'initiatorId',
 			'displayname_owner' => 'initiatorDisplay',
 			'item_type' => 'file',
@@ -757,6 +758,7 @@ class ShareAPIControllerTest extends TestCase {
 		$user = $this->getMockBuilder(IUser::class)->getMock();
 		$user->method('getUID')->willReturn('userId');
 		$user->method('getDisplayName')->willReturn('userDisplay');
+		$user->method('getEMailAddress')->willReturn('userId@example.com');
 
 		$group = $this->getMockBuilder('OCP\IGroup')->getMock();
 		$group->method('getGID')->willReturn('groupId');
@@ -3401,6 +3403,8 @@ class ShareAPIControllerTest extends TestCase {
 		$initiator->method('getDisplayName')->willReturn('initiatorDN');
 		$recipient = $this->getMockBuilder(IUser::class)->getMock();
 		$recipient->method('getDisplayName')->willReturn('recipientDN');
+		$recipient->method('getEmailAddress')->willReturn('recipient');
+
 
 		$result = [];
 
@@ -3440,6 +3444,7 @@ class ShareAPIControllerTest extends TestCase {
 				'file_target' => 'myTarget',
 				'share_with' => 'recipient',
 				'share_with_displayname' => 'recipient',
+				'share_with_displayname_unique' => 'recipient',
 				'note' => 'personal note',
 				'label' => null,
 				'mail_send' => 0,
@@ -3475,6 +3480,7 @@ class ShareAPIControllerTest extends TestCase {
 				'file_target' => 'myTarget',
 				'share_with' => 'recipient',
 				'share_with_displayname' => 'recipientDN',
+				'share_with_displayname_unique' => 'recipient',
 				'mail_send' => 0,
 				'mimetype' => 'myMimeType',
 				'hide_download' => 0,
@@ -3524,6 +3530,7 @@ class ShareAPIControllerTest extends TestCase {
 				'file_target' => 'myTarget',
 				'share_with' => 'recipient',
 				'share_with_displayname' => 'recipient',
+				'share_with_displayname_unique' => 'recipient',
 				'mail_send' => 0,
 				'mimetype' => 'myMimeType',
 				'hide_download' => 0,
@@ -3569,6 +3576,7 @@ class ShareAPIControllerTest extends TestCase {
 				'file_target' => 'myTarget',
 				'share_with' => 'recipient',
 				'share_with_displayname' => 'recipient',
+				'share_with_displayname_unique' => 'recipient',
 				'mail_send' => 0,
 				'mimetype' => 'myMimeType',
 				'hide_download' => 0,
