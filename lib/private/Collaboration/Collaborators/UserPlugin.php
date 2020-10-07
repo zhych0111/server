@@ -122,6 +122,7 @@ class UserPlugin implements ISearchPlugin {
 						'shareType' => Share::SHARE_TYPE_USER,
 						'shareWith' => $uid,
 					],
+					'shareWithDisplayNameUnique' => !empty($userEmail) ? $userEmail : $uid,
 				];
 			}
 		}
@@ -146,6 +147,7 @@ class UserPlugin implements ISearchPlugin {
 							'shareType' => Share::SHARE_TYPE_USER,
 							'shareWith' => $user->getUID(),
 						],
+						'shareWithDisplayNameUnique' => $userEmail !== null && $userEmail !== '' ? $userEmail : $uid
 					];
 				}
 			}
