@@ -121,7 +121,7 @@ class RegistryTest extends TestCase {
 	public function testSubscriptionService() {
 		$this->serverContainer->method('query')
 			->with(DummySubscription::class)
-			->willReturn(new DummySubscription(true, false));
+			->willReturn(new DummySubscription(true, false, false));
 		$this->registry->registerService(DummySubscription::class);
 
 		$this->assertTrue($this->registry->delegateHasValidSubscription());
