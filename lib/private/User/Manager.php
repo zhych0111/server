@@ -42,6 +42,7 @@ use OCP\IGroup;
 use OCP\IUser;
 use OCP\IUserBackend;
 use OCP\IUserManager;
+use OCP\Support\Subscription\IRegistry;
 use OCP\User\Backend\IGetRealUIDBackend;
 use OCP\User\Events\CreateUserEvent;
 use OCP\User\Events\UserCreatedEvent;
@@ -84,10 +85,13 @@ class Manager extends PublicEmitter implements IUserManager {
 
 	/** @var IEventDispatcher */
 	private $eventDispatcher;
+	/** @var IRegistry */
+	private $subscriptionRegistry;
 
 	public function __construct(IConfig $config,
 								EventDispatcherInterface $oldDispatcher,
-								IEventDispatcher $eventDispatcher) {
+								IEventDispatcher $eventDispatcher,
+								IRegistry $subscriptionRegistry) {
 		$this->config = $config;
 		$this->dispatcher = $oldDispatcher;
 		$cachedUsers = &$this->cachedUsers;
@@ -96,6 +100,7 @@ class Manager extends PublicEmitter implements IUserManager {
 			unset($cachedUsers[$user->getUID()]);
 		});
 		$this->eventDispatcher = $eventDispatcher;
+		$this->subscriptionRegistry = $subscriptionRegistry;
 	}
 
 	/**
@@ -297,6 +302,10 @@ class Manager extends PublicEmitter implements IUserManager {
 	 * @return bool|IUser the created user or false
 	 */
 	public function createUser($uid, $password) {
+		if ($this->subscriptionRegistry->delegateIsHardUserLimitReached()) {
+			return false;
+		}
+
 		$localBackends = [];
 		foreach ($this->backends as $backend) {
 			if ($backend instanceof Database) {
