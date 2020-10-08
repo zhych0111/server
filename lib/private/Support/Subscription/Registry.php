@@ -28,6 +28,7 @@ declare(strict_types=1);
 
 namespace OC\Support\Subscription;
 
+use OC\User\Backend;
 use OCP\AppFramework\QueryException;
 use OCP\IConfig;
 use OCP\IServerContainer;
@@ -154,7 +155,11 @@ class Registry implements IRegistry {
 		$subscription = $this->getSubscription();
 		if ($subscription instanceof ISubscription &&
 			$subscription->hasValidSubscription()) {
-			return $subscription->isHardUserLimitReached();
+			$userLimitReached = $subscription->isHardUserLimitReached();
+			if ($userLimitReached) {
+				$this->notifyAboutReachedUserLimit();
+			}
+			return $userLimitReached;
 		}
 
 		$isOneClickInstance = $this->config->getSystemValue('one-click-instance', false) !== false;
@@ -166,14 +171,14 @@ class Registry implements IRegistry {
 		$userCount = $this->getUserCount();
 		$hardUserLimit = $this->config->getSystemValue('one-click-instance.user-limit', 50);
 
-		return $userCount >= $hardUserLimit;
+		$userLimitReached = $userCount >= $hardUserLimit;
+		if ($userLimitReached) {
+			$this->notifyAboutReachedUserLimit();
+		}
+		return $userLimitReached;
 	}
 
 	private function getUserCount(): int {
-		if ($this->userCount > 0) {
-			return $this->userCount;
-		}
-
 		$userCount = 0;
 		$backends = $this->userManager->getBackends();
 		foreach ($backends as $backend) {
@@ -183,22 +188,27 @@ class Registry implements IRegistry {
 					$userCount += $backendUsers;
 				} else {
 					// TODO what if the user count can't be determined?
-					$this->logger->warning('Can not determine user count for ' . get_class($backend), ['app' => 'support']);
+					$this->logger->warning('Can not determine user count for ' . get_class($backend), ['app' => 'lib']);
 				}
 			}
 		}
 
 		$disabledUsers = $this->config->getUsersForUserValue('core', 'enabled', 'false');
 		$disabledUsersCount = count($disabledUsers);
-		$this->userCount = $userCount - $disabledUsersCount;
+		$userCount = $userCount - $disabledUsersCount;
 
-		if ($this->userCount < 0) {
-			$this->userCount = 0;
+		if ($userCount < 0) {
+			$userCount = 0;
 
-			// TODO this should never happen
-			$this->logger->warning("Total user count was negative (users: $userCount, disabled: $disabledUsersCount)", ['app' => 'support']);
+			// this should never happen
+			$this->logger->warning("Total user count was negative (users: $userCount, disabled: $disabledUsersCount)", ['app' => 'lib']);
 		}
 
-		return $this->userCount;
+		return $userCount;
+	}
+
+	private function notifyAboutReachedUserLimit() {
+		// TODO notify admin about reached user limit
+		$this->logger->warning('The user limit was reached and the new user was not created', ['app' => 'lib']);
 	}
 }

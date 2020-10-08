@@ -34,6 +34,7 @@
 
 namespace OC\User;
 
+use OC\HintException;
 use OC\Hooks\PublicEmitter;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -85,13 +86,10 @@ class Manager extends PublicEmitter implements IUserManager {
 
 	/** @var IEventDispatcher */
 	private $eventDispatcher;
-	/** @var IRegistry */
-	private $subscriptionRegistry;
 
 	public function __construct(IConfig $config,
 								EventDispatcherInterface $oldDispatcher,
-								IEventDispatcher $eventDispatcher,
-								IRegistry $subscriptionRegistry) {
+								IEventDispatcher $eventDispatcher) {
 		$this->config = $config;
 		$this->dispatcher = $oldDispatcher;
 		$cachedUsers = &$this->cachedUsers;
@@ -100,7 +98,6 @@ class Manager extends PublicEmitter implements IUserManager {
 			unset($cachedUsers[$user->getUID()]);
 		});
 		$this->eventDispatcher = $eventDispatcher;
-		$this->subscriptionRegistry = $subscriptionRegistry;
 	}
 
 	/**
@@ -302,8 +299,10 @@ class Manager extends PublicEmitter implements IUserManager {
 	 * @return bool|IUser the created user or false
 	 */
 	public function createUser($uid, $password) {
-		if ($this->subscriptionRegistry->delegateIsHardUserLimitReached()) {
-			return false;
+		// DI injection is not used here as IRegistry needs the user manager itself for user count and thus it would create a cyclic dependency
+		if (\OC::$server->get(IRegistry::class)->delegateIsHardUserLimitReached()) {
+			$l = \OC::$server->getL10N('lib');
+			throw new HintException($l->t('The user limit has been reached and the user was not created.'));
 		}
 
 		$localBackends = [];
