@@ -184,7 +184,7 @@ class Registry implements IRegistry {
 		foreach ($backends as $backend) {
 			if ($backend->implementsActions(Backend::COUNT_USERS)) {
 				$backendUsers = $backend->countUsers();
-				if($backendUsers !== false) {
+				if ($backendUsers !== false) {
 					$userCount += $backendUsers;
 				} else {
 					// TODO what if the user count can't be determined?
