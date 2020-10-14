@@ -99,6 +99,11 @@ class Notify extends Base {
 				'',
 				InputOption::VALUE_NONE,
 				'Disable self check on startup'
+			)->addOption(
+				'dry-run',
+				'',
+				InputOption::VALUE_NONE,
+				'Don\'t make any changes, only log detected changes'
 			);
 		parent::configure();
 	}
@@ -181,7 +186,8 @@ class Notify extends Base {
 			return 1;
 		}
 
-		$verbose = $input->getOption('verbose');
+		$dryRun = $input->getOption('dry-run');
+		$verbose = $input->getOption('verbose') || $dryRun;
 
 		$path = trim($input->getOption('path'), '/');
 		$notifyHandler = $storage->notify($path);
@@ -190,14 +196,14 @@ class Notify extends Base {
 			$this->selfTest($storage, $notifyHandler, $verbose, $output);
 		}
 
-		$notifyHandler->listen(function (IChange $change) use ($mount, $verbose, $output) {
+		$notifyHandler->listen(function (IChange $change) use ($mount, $verbose, $output, $dryRun) {
 			if ($verbose) {
 				$this->logUpdate($change, $output);
 			}
 			if ($change instanceof IRenameChange) {
-				$this->markParentAsOutdated($mount->getId(), $change->getTargetPath(), $output);
+				$this->markParentAsOutdated($mount->getId(), $change->getTargetPath(), $output, $verbose, $dryRun);
 			}
-			$this->markParentAsOutdated($mount->getId(), $change->getPath(), $output);
+			$this->markParentAsOutdated($mount->getId(), $change->getPath(), $output, $verbose, $dryRun);
 		});
 		return 0;
 	}
@@ -207,29 +213,48 @@ class Notify extends Base {
 		return new $class($mount->getBackendOptions());
 	}
 
-	private function markParentAsOutdated($mountId, $path, OutputInterface $output) {
+	private function markParentAsOutdated($mountId, $path, OutputInterface $output, bool $verbose, bool $dryRun) {
 		$parent = ltrim(dirname($path), '/');
 		if ($parent === '.') {
 			$parent = '';
 		}
 
 		try {
-			$storageIds = $this->getStorageIds($mountId);
+			$storages = $this->getStorageIds($mountId, $parent);
 		} catch (DriverException $ex) {
 			$this->logger->logException($ex, ['message' => 'Error while trying to find correct storage ids.', 'level' => ILogger::WARN]);
 			$this->connection = $this->reconnectToDatabase($this->connection, $output);
 			$output->writeln('<info>Needed to reconnect to the database</info>');
-			$storageIds = $this->getStorageIds($mountId);
+			$storages = $this->getStorageIds($mountId, $path);
 		}
-		if (count($storageIds) === 0) {
-			throw new StorageNotAvailableException('No storages found by mount ID ' . $mountId);
+		if (count($storages) === 0) {
+			if ($verbose) {
+				$output->writeln("  no users found with access to '$parent', skipping");
+			}
+			return;
 		}
-		$storageIds = array_map('intval', $storageIds);
 
-		$result = $this->updateParent($storageIds, $parent);
-		if ($result === 0) {
-			//TODO: Find existing parent further up the tree in the database and register that folder instead.
-			$this->logger->info('Failed updating parent for "' . $path . '" while trying to register change. It may not exist in the filecache.');
+		$users = array_map(function(array $storage) {
+			return $storage['user_id'];
+		},$storages);
+
+		if ($verbose) {
+			$output->writeln("  marking '$parent' as outdated for " . implode(', ', $users));
+		}
+
+		$storageIds = array_map(function(array $storage) {
+			return intval($storage['storage_id']);
+		},$storages);
+		$storageIds = array_values(array_unique($storageIds));
+
+		if ($dryRun) {
+			$output->writeln("  dry-run: skipping database write");
+		} else {
+			$result = $this->updateParent($storageIds, $parent);
+			if ($result === 0) {
+				//TODO: Find existing parent further up the tree in the database and register that folder instead.
+				$this->logger->info('Failed updating parent for "' . $path . '" while trying to register change. It may not exist in the filecache.');
+			}
 		}
 	}
 
@@ -259,18 +284,17 @@ class Notify extends Base {
 		$output->writeln($text);
 	}
 
-	/**
-	 * @param int $mountId
-	 * @return array
-	 */
-	private function getStorageIds($mountId) {
+	private function getStorageIds(int $mountId, string $path): array {
+		$pathHash = md5(trim(\OC_Util::normalizeUnicode($path), '/'));
 		$qb = $this->connection->getQueryBuilder();
 		return $qb
-			->select('storage_id')
-			->from('mounts')
+			->select('storage_id', 'user_id')
+			->from('mounts', 'm')
+			->innerJoin('m', 'filecache', 'f', $qb->expr()->eq('m.storage_id', 'f.storage'))
 			->where($qb->expr()->eq('mount_id', $qb->createNamedParameter($mountId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('path_hash', $qb->createNamedParameter($pathHash, IQueryBuilder::PARAM_STR)))
 			->execute()
-			->fetchAll(\PDO::FETCH_COLUMN);
+			->fetchAll();
 	}
 
 	/**
