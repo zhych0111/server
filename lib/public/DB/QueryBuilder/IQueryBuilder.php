@@ -153,6 +153,26 @@ interface IQueryBuilder {
 	public function execute();
 
 	/**
+	 * Execute for select statements
+	 *
+	 * @return \Doctrine\DBAL\Driver\Statement
+	 * @since 21.0.0
+	 *
+	 * @throws \RuntimeException in case of usage with non select query
+	 */
+	public function executeQuery(): \Doctrine\DBAL\Driver\Statement;
+
+	/**
+	 * Execute  for insert, update and delete statements
+	 *
+	 * @return int
+	 * @since 21.0.0
+	 *
+	 * @throws \RuntimeException in case of usage with select query
+	 */
+	public function executeUpdate(): int;
+
+	/**
 	 * Gets the complete SQL string formed by the current specifications of this QueryBuilder.
 	 *
 	 * <code>

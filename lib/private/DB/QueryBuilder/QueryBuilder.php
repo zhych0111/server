@@ -218,6 +218,35 @@ class QueryBuilder implements IQueryBuilder {
 		return $this->queryBuilder->execute();
 	}
 
+	public function executeQuery(): \Doctrine\DBAL\Driver\Statement {
+		if ($this->getType() !== \Doctrine\DBAL\Query\QueryBuilder::SELECT) {
+			throw new \RuntimeException('Invalid query type, expected SELECT query');
+		}
+
+		$result = $this->execute();
+
+		if ($result instanceof \Doctrine\DBAL\Driver\Statement) {
+			return $result;
+		}
+
+		throw new \RuntimeException('Invalid return type for query');
+	}
+
+	public function executeUpdate(): int {
+		if ($this->getType() === \Doctrine\DBAL\Query\QueryBuilder::SELECT) {
+			throw new \RuntimeException('Invalid query type, expected INSERT, DELETE or UPDATE query');
+		}
+
+		$result = $this->execute();
+
+		if ($result instanceof \Doctrine\DBAL\Driver\Statement) {
+			throw new \RuntimeException('Invalid return type for query');
+		}
+
+		return $result;
+	}
+
+
 	/**
 	 * Gets the complete SQL string formed by the current specifications of this QueryBuilder.
 	 *
