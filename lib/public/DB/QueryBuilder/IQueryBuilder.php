@@ -149,6 +149,7 @@ interface IQueryBuilder {
 	 *
 	 * @return \Doctrine\DBAL\Driver\Statement|int
 	 * @since 8.2.0
+	 * @deprecated 21.0.0 Use executeQuery or executeUpdate
 	 */
 	public function execute();
 
