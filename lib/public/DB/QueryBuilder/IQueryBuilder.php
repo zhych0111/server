@@ -155,12 +155,12 @@ interface IQueryBuilder {
 	/**
 	 * Execute for select statements
 	 *
-	 * @return \Doctrine\DBAL\Driver\Statement
+	 * @return IStatement
 	 * @since 21.0.0
 	 *
 	 * @throws \RuntimeException in case of usage with non select query
 	 */
-	public function executeQuery(): \Doctrine\DBAL\Driver\Statement;
+	public function executeQuery(): IStatement;
 
 	/**
 	 * Execute  for insert, update and delete statements

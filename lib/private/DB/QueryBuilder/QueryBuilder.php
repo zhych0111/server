@@ -46,6 +46,7 @@ use OCP\DB\QueryBuilder\ILiteral;
 use OCP\DB\QueryBuilder\IParameter;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\QueryBuilder\IQueryFunction;
+use OCP\DB\QueryBuilder\IStatement;
 use OCP\IDBConnection;
 use OCP\ILogger;
 
@@ -218,7 +219,7 @@ class QueryBuilder implements IQueryBuilder {
 		return $this->queryBuilder->execute();
 	}
 
-	public function executeQuery(): \Doctrine\DBAL\Driver\Statement {
+	public function executeQuery(): IStatement {
 		if ($this->getType() !== \Doctrine\DBAL\Query\QueryBuilder::SELECT) {
 			throw new \RuntimeException('Invalid query type, expected SELECT query');
 		}
@@ -226,7 +227,7 @@ class QueryBuilder implements IQueryBuilder {
 		$result = $this->execute();
 
 		if ($result instanceof \Doctrine\DBAL\Driver\Statement) {
-			return $result;
+			return new Statement($result);
 		}
 
 		throw new \RuntimeException('Invalid return type for query');
