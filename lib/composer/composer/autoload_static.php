@@ -1348,6 +1348,7 @@ class ComposerStaticInit53792487c5a8370acc0b06b1a864ff4c
         'OC\\Setup\\PostgreSQL' => __DIR__ . '/../../..' . '/lib/private/Setup/PostgreSQL.php',
         'OC\\Setup\\Sqlite' => __DIR__ . '/../../..' . '/lib/private/Setup/Sqlite.php',
         'OC\\Share20\\DefaultShareProvider' => __DIR__ . '/../../..' . '/lib/private/Share20/DefaultShareProvider.php',
+        'OC\\Share20\\Exception\\AlreadyShared' => __DIR__ . '/../../..' . '/lib/private/Share20/Exception/AlreadyShared.php',
         'OC\\Share20\\Exception\\BackendError' => __DIR__ . '/../../..' . '/lib/private/Share20/Exception/BackendError.php',
         'OC\\Share20\\Exception\\InvalidShare' => __DIR__ . '/../../..' . '/lib/private/Share20/Exception/InvalidShare.php',
         'OC\\Share20\\Exception\\ProviderException' => __DIR__ . '/../../..' . '/lib/private/Share20/Exception/ProviderException.php',

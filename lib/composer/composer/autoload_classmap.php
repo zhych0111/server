@@ -1319,6 +1319,7 @@ return array(
     'OC\\Setup\\PostgreSQL' => $baseDir . '/lib/private/Setup/PostgreSQL.php',
     'OC\\Setup\\Sqlite' => $baseDir . '/lib/private/Setup/Sqlite.php',
     'OC\\Share20\\DefaultShareProvider' => $baseDir . '/lib/private/Share20/DefaultShareProvider.php',
+    'OC\\Share20\\Exception\\AlreadyShared' => $baseDir . '/lib/private/Share20/Exception/AlreadyShared.php',
     'OC\\Share20\\Exception\\BackendError' => $baseDir . '/lib/private/Share20/Exception/BackendError.php',
     'OC\\Share20\\Exception\\InvalidShare' => $baseDir . '/lib/private/Share20/Exception/InvalidShare.php',
     'OC\\Share20\\Exception\\ProviderException' => $baseDir . '/lib/private/Share20/Exception/ProviderException.php',

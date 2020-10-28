@@ -25,6 +25,7 @@ use OC\Files\Mount\MoveableMount;
 use OC\HintException;
 use OC\Share20\DefaultShareProvider;
 use OC\Share20\Exception;
+use OC\Share20\Exception\AlreadyShared;
 use OC\Share20\Manager;
 use OC\Share20\Share;
 use OCP\EventDispatcher\Event;
@@ -1083,11 +1084,12 @@ class ManagerTest extends \Test\TestCase {
 
 
 	public function testUserCreateChecksIdenticalShareExists() {
-		$this->expectException(\Exception::class);
-		$this->expectExceptionMessage('Path is already shared with this user');
+		$this->expectException(AlreadyShared::class);
 
 		$share = $this->manager->newShare();
 		$share2 = $this->manager->newShare();
+
+		$share->setSharedWithDisplayName('user');
 
 		$sharedWith = $this->createMock(IUser::class);
 		$path = $this->createMock(Node::class);
@@ -1103,13 +1105,15 @@ class ManagerTest extends \Test\TestCase {
 			->with($path)
 			->willReturn([$share2]);
 
+		$path->method('getName')
+			->willReturn('name.txt');
+
 		self::invokePrivate($this->manager, 'userCreateChecks', [$share]);
 	}
 
 
 	public function testUserCreateChecksIdenticalPathSharedViaGroup() {
-		$this->expectException(\Exception::class);
-		$this->expectExceptionMessage('Path is already shared with this user');
+		$this->expectException(AlreadyShared::class);
 
 		$share = $this->manager->newShare();
 
@@ -1123,6 +1127,7 @@ class ManagerTest extends \Test\TestCase {
 		$share->setSharedWith('sharedWith')
 			->setNode($path)
 			->setShareOwner('shareOwner')
+			->setSharedWithDisplayName('user')
 			->setProviderId('foo')
 			->setId('bar');
 
@@ -1137,6 +1142,9 @@ class ManagerTest extends \Test\TestCase {
 		$group->method('inGroup')
 			->with($sharedWith)
 			->willReturn(true);
+
+		$path->method('getName')
+			->willReturn('name.txt');
 
 		$this->groupManager->method('get')->with('group')->willReturn($group);
 

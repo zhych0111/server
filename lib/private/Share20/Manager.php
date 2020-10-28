@@ -42,6 +42,7 @@ namespace OC\Share20;
 use OC\Cache\CappedMemoryCache;
 use OC\Files\Mount\MoveableMount;
 use OC\HintException;
+use OC\Share20\Exception\AlreadyShared;
 use OC\Share20\Exception\ProviderException;
 use OCA\Files_Sharing\ISharedStorage;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -565,7 +566,7 @@ class Manager implements IManager {
 
 			// Identical share already exist
 			if ($existingShare->getSharedWith() === $share->getSharedWith() && $existingShare->getShareType() === $share->getShareType()) {
-				throw new \Exception($this->l->t('Sharing %s failed, because this item is already shared with user %s', [$share->getNode()->getName(), $share->getSharedWithDisplayName()]));
+				throw new AlreadyShared($this->l, $share->getNode()->getName(), $share->getSharedWithDisplayName());
 			}
 
 			// The share is already shared with this user via a group share
@@ -575,7 +576,7 @@ class Manager implements IManager {
 					$user = $this->userManager->get($share->getSharedWith());
 
 					if ($group->inGroup($user) && $existingShare->getShareOwner() !== $share->getShareOwner()) {
-						throw new \Exception($this->l->t('Sharing %s failed, because this item is already shared with user %s', [$share->getNode()->getName(), $share->getSharedWithDisplayName()]));
+						throw new AlreadyShared($this->l, $share->getNode()->getName(), $share->getSharedWithDisplayName());
 					}
 				}
 			}
@@ -1187,7 +1188,7 @@ class Manager implements IManager {
 	 * @param string $recipientId
 	 */
 	public function deleteFromSelf(IShare $share, $recipientId) {
-		list($providerId, ) = $this->splitFullId($share->getFullId());
+		[$providerId, ] = $this->splitFullId($share->getFullId());
 		$provider = $this->factory->getProvider($providerId);
 
 		$provider->deleteFromSelf($share, $recipientId);
@@ -1196,7 +1197,7 @@ class Manager implements IManager {
 	}
 
 	public function restoreShare(IShare $share, string $recipientId): IShare {
-		list($providerId, ) = $this->splitFullId($share->getFullId());
+		[$providerId, ] = $this->splitFullId($share->getFullId());
 		$provider = $this->factory->getProvider($providerId);
 
 		return $provider->restore($share, $recipientId);
@@ -1225,7 +1226,7 @@ class Manager implements IManager {
 			}
 		}
 
-		list($providerId, ) = $this->splitFullId($share->getFullId());
+		[$providerId, ] = $this->splitFullId($share->getFullId());
 		$provider = $this->factory->getProvider($providerId);
 
 		return $provider->move($share, $recipientId);
@@ -1371,7 +1372,7 @@ class Manager implements IManager {
 			throw new ShareNotFound();
 		}
 
-		list($providerId, $id) = $this->splitFullId($id);
+		[$providerId, $id] = $this->splitFullId($id);
 
 		try {
 			$provider = $this->factory->getProvider($providerId);
