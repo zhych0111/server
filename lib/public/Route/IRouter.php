@@ -37,16 +37,6 @@ namespace OCP\Route;
 interface IRouter {
 
 	/**
-	 * Sets the collection to use for adding routes
-	 *
-	 * @param string $name Name of the collection to use.
-	 * @return void
-	 * @since 7.0.0
-	 * @deprecated 9.0.0
-	 */
-	public function useCollection($name);
-
-	/**
 	 * Create a \OCP\Route\IRoute.
 	 *
 	 * @param string $name Name of the route to create.
