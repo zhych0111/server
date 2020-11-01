@@ -55,7 +55,7 @@ try {
 	// load all apps to get all api routes properly setup
 	OC_App::loadApps();
 
-	OC::$server->getRouter()->match('/ocs'.\OC::$server->getRequest()->getRawPathInfo());
+	OC::$server->get(\OC\Route\Router::class)->match('/ocs'.\OC::$server->getRequest()->getRawPathInfo());
 
 	sleep(1);
 	OC::$server->getLogger()->info('This uses an old OCP\API::register construct. This will be removed in a future version of Nextcloud. Please migrate to the OCSController');
@@ -85,7 +85,7 @@ try {
 	if (!\OC::$server->getUserSession()->isLoggedIn()) {
 		OC::handleLogin(\OC::$server->getRequest());
 	}
-	OC::$server->getRouter()->match('/ocsapp'.\OC::$server->getRequest()->getRawPathInfo());
+	OC::$server->get(\OC\Route\Router::class)->match('/ocsapp'.\OC::$server->getRequest()->getRawPathInfo());
 } catch (ResourceNotFoundException $e) {
 	OC_API::setContentType();
 

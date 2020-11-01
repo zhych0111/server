@@ -48,27 +48,4 @@ interface IRouter {
 	 * @deprecated 9.0.0
 	 */
 	public function create($name, $pattern, array $defaults = [], array $requirements = []);
-
-	/**
-	 * Find the route matching $url.
-	 *
-	 * @param string $url The url to find
-	 * @throws \Exception
-	 * @return void
-	 * @since 7.0.0
-	 * @deprecated 9.0.0
-	 */
-	public function match($url);
-
-	/**
-	 * Generate url based on $name and $parameters
-	 *
-	 * @param string $name Name of the route to use.
-	 * @param array $parameters Parameters for the route
-	 * @param bool $absolute
-	 * @return string
-	 * @since 7.0.0
-	 * @deprecated 9.0.0
-	 */
-	public function generate($name, $parameters = [], $absolute = false);
 }
