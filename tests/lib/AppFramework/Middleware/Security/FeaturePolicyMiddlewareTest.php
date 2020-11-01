@@ -25,7 +25,7 @@ declare(strict_types=1);
 
 namespace Test\AppFramework\Middleware\Security;
 
-use OC\AppFramework\Middleware\Security\FeaturePolicyMiddleware;
+use OC\AppFramework\Middleware\Security\PermissionPolicyMiddleware;
 use OC\Security\FeaturePolicy\FeaturePolicy;
 use OC\Security\FeaturePolicy\FeaturePolicyManager;
 use OCP\AppFramework\Controller;
@@ -35,7 +35,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class FeaturePolicyMiddlewareTest extends \Test\TestCase {
 
-	/** @var FeaturePolicyMiddleware|MockObject */
+	/** @var PermissionPolicyMiddleware|MockObject */
 	private $middleware;
 	/** @var Controller|MockObject */
 	private $controller;
@@ -47,7 +47,7 @@ class FeaturePolicyMiddlewareTest extends \Test\TestCase {
 
 		$this->controller = $this->createMock(Controller::class);
 		$this->manager = $this->createMock(FeaturePolicyManager::class);
-		$this->middleware = new FeaturePolicyMiddleware(
+		$this->middleware = new PermissionPolicyMiddleware(
 			$this->manager
 		);
 	}
