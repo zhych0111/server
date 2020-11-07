@@ -175,18 +175,22 @@ export default {
 			text-overflow: ellipsis;
 		}
 	}
+
 	input[type=text] {
 		margin: 0;
 	}
+
 	::placeholder {
 		font-size: 10px;
 	}
+
 	button.action-item.action-item--single.icon-close {
 		height: 44px;
 		width: 44px;
 		margin-top: -5px;
 		margin-bottom: -5px;
 	}
+
 	.invalid {
 		border: 1px solid var(--color-error) !important;
 	}

@@ -189,18 +189,22 @@ export default {
 		display: block;
 		margin: 3px 10px 3px auto;
 	}
+
 	.status-button.primary {
 		padding-left: 32px;
 		background-position: 10px center;
 	}
+
 	.status-button:not(.primary) {
 		background-color: var(--color-main-background);
 	}
+
 	.status-button.invalid {
 		background-color: var(--color-warning);
 		color: #fff;
 		border: none;
 	}
+
 	.status-button.icon-checkmark {
 		border: 1px solid var(--color-success);
 	}
@@ -229,6 +233,7 @@ export default {
 			margin-right: 20px;
 		}
 	}
+
 	.trigger p, .action p {
 		min-height: 34px;
 		display: flex;
@@ -245,8 +250,9 @@ export default {
 			max-width: 300px;
 		}
 	}
+
 	.trigger p:first-child span {
-			padding-top: 3px;
+		padding-top: 3px;
 	}
 
 	.check--add {

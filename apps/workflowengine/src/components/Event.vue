@@ -82,6 +82,7 @@ export default {
 	.event {
 		margin-bottom: 5px;
 	}
+
 	.isComplex {
 		img {
 			vertical-align: text-top;
@@ -91,14 +92,17 @@ export default {
 			display: inline-block;
 		}
 	}
+
 	.multiselect {
 		width: 100%;
 		max-width: 550px;
 		margin-top: 4px;
 	}
+
 	.multiselect::v-deep .multiselect__single {
 		display: flex;
 	}
+
 	.multiselect:not(.multiselect--active)::v-deep .multiselect__tags {
 		background-color: var(--color-main-background) !important;
 		border: 1px solid transparent;
@@ -124,6 +128,7 @@ export default {
 		margin-left: 5px;
 		color: var(--color-main-text);
 	}
+
 	.option__title_single {
 		font-weight: 900;
 	}

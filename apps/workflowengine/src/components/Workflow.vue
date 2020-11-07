@@ -104,6 +104,7 @@ export default {
 	#workflowengine {
 		border-bottom: 1px solid var(--color-border);
 	}
+
 	.section {
 		max-width: 100vw;
 
@@ -112,6 +113,7 @@ export default {
 			margin-bottom: 0;
 		}
 	}
+
 	.actions {
 		display: flex;
 		flex-wrap: wrap;
@@ -161,7 +163,7 @@ export default {
 		padding-bottom: 0;
 	}
 
-	@import "./../styles/operation";
+	@import './../styles/operation';
 
 	.actions__item.more {
 		background-color: var(--color-background-dark);

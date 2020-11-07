@@ -5,18 +5,19 @@ const TerserPlugin = require('terser-webpack-plugin')
 module.exports = common.map(
 	config => merge(config, {
 		mode: 'production',
-		devtool: '#source-map',
+		devtool: 'source-map',
 		// This is required to keep IE11 compatibility (see #21316)
 		optimization: {
 			minimize: true,
 			minimizer: [
 				new TerserPlugin({
+					// Do not extract copyright headers
+					extractComments: false,
 					terserOptions: {
 						output: {
 							keep_quoted_props: true,
 						},
 					},
-					sourceMap: true,
 				}),
 			],
 		},
