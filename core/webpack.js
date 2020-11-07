@@ -17,7 +17,6 @@ module.exports = [
 		output: {
 			filename: '[name].js',
 			path: path.resolve(__dirname, 'js/dist'),
-			jsonpFunction: 'webpackJsonpCore',
 		},
 		module: {
 			rules: [

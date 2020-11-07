@@ -6,6 +6,5 @@ module.exports = {
 		path: path.resolve(__dirname, 'js'),
 		publicPath: '/js/',
 		filename: 'files_versions.js',
-		jsonpFunction: 'webpackJsonpFilesVersions'
 	}
 }
