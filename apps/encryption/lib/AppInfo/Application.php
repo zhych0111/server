@@ -44,13 +44,16 @@ use OCA\Encryption\Recovery;
 use OCA\Encryption\Session;
 use OCA\Encryption\Users\Setup;
 use OCA\Encryption\Util;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Encryption\IManager;
 use OCP\IConfig;
 use OCP\IServerContainer;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
 
-class Application extends \OCP\AppFramework\App {
+class Application extends \OCP\AppFramework\App implements IBootstrap {
 
 	/** @var IManager */
 	private $encryptionManager;
@@ -65,6 +68,12 @@ class Application extends \OCP\AppFramework\App {
 		$this->encryptionManager = \OC::$server->getEncryptionManager();
 		$this->config = \OC::$server->getConfig();
 		$this->registerServices();
+		if ($this->encryptionManager->isReady()) {
+			$this->registerEncryptionModule();
+			$this->registerHooks();
+			$this->setUp();
+		}
+		\OCP\Util::addScript('encryption', 'encryption');
 	}
 
 	public function setUp() {
@@ -262,5 +271,11 @@ class Application extends \OCP\AppFramework\App {
 				);
 		}
 		);
+	}
+
+	public function register(IRegistrationContext $context): void {
+	}
+
+	public function boot(IBootContext $context): void {
 	}
 }
