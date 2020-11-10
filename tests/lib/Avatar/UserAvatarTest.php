@@ -51,6 +51,9 @@ class UserAvatarTest extends \Test\TestCase {
 		];
 	}
 
+	/**
+	 * @requires PHP 7
+	 */
 	public function testGetNoAvatar() {
 		$file = $this->createMock(ISimpleFile::class);
 		$this->folder->method('newFile')
