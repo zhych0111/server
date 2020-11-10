@@ -200,6 +200,10 @@ class UserAvatarTest extends \Test\TestCase {
 	}
 
 	public function testSetAvatar() {
+		if (PHP_MAJOR_VERSION > 7) {
+			$this->markTestSkipped('Only run on php7');
+		}
+
 		$avatarFileJPG = $this->createMock(File::class);
 		$avatarFileJPG->method('getName')
 			->willReturn('avatar.jpg');
