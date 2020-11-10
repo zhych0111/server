@@ -51,10 +51,11 @@ class UserAvatarTest extends \Test\TestCase {
 		];
 	}
 
-	/**
-	 * @requires PHP 7
-	 */
 	public function testGetNoAvatar() {
+		if (PHP_MAJOR_VERSION > 7) {
+			$this->markTestSkipped('Only run on php7');
+		}
+
 		$file = $this->createMock(ISimpleFile::class);
 		$this->folder->method('newFile')
 			->willReturn($file);
@@ -90,6 +91,10 @@ class UserAvatarTest extends \Test\TestCase {
 	}
 
 	public function testGetAvatarSizeMatch() {
+		if (PHP_MAJOR_VERSION > 7) {
+			$this->markTestSkipped('Only run on php7');
+		}
+
 		$this->folder->method('fileExists')
 			->willReturnMap([
 				['avatar.jpg', true],
@@ -107,6 +112,10 @@ class UserAvatarTest extends \Test\TestCase {
 	}
 
 	public function testGetAvatarSizeMinusOne() {
+		if (PHP_MAJOR_VERSION > 7) {
+			$this->markTestSkipped('Only run on php7');
+		}
+
 		$this->folder->method('fileExists')
 			->willReturnMap([
 				['avatar.jpg', true],
@@ -123,6 +132,10 @@ class UserAvatarTest extends \Test\TestCase {
 	}
 
 	public function testGetAvatarNoSizeMatch() {
+		if (PHP_MAJOR_VERSION > 7) {
+			$this->markTestSkipped('Only run on php7');
+		}
+
 		$this->folder->method('fileExists')
 			->willReturnMap([
 				['avatar.png', true],
