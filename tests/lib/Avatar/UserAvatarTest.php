@@ -78,9 +78,12 @@ class UserAvatarTest extends \Test\TestCase {
 			}));
 
 		$file->method('getContent')
-			->willReturn($data);
+			->willReturnCallback(function() use (&$data) {
+				return $data;
+			});
 
-		$this->assertEquals($data, $this->avatar->get()->data());
+		$result = $this->avatar->get();
+		$this->assertTrue($result->valid());
 	}
 
 	public function testGetAvatarSizeMatch() {
